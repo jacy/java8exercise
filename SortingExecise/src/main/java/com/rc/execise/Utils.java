@@ -22,7 +22,7 @@ public class Utils {
 	 **/
 
 	public static List<Extension> sortByName(List<Extension> extensions) {
-		Comparator<String> nullFirstComparator = Comparator.nullsFirst(String::compareToIgnoreCase);
+		Comparator<String> nullFirstComparator = Comparator.nullsFirst(String::compareTo);
 		Comparator<Extension> compator = comparing(Extension::getFirstName).thenComparing(Extension::getLastName, nullFirstComparator).thenComparing(Extension::getExt, nullFirstComparator);
 		return extensions.stream().sorted(compator).collect(Collectors.toList());
 	}
@@ -33,7 +33,7 @@ public class Utils {
 	 *
 	 **/
 	public static List<Extension> sortByExtType(List<Extension> extensions) {
-		return extensions.stream().sorted((e1, e2) -> Integer.valueOf(EXTTYPE_ORDERING.indexOf(e1.getExtType())).compareTo(EXTTYPE_ORDERING.indexOf(e2.getExtType()))).collect(Collectors.toList());
+		return extensions.stream().sorted((e1, e2) -> Integer.compare(EXTTYPE_ORDERING.indexOf(e1.getExtType()), EXTTYPE_ORDERING.indexOf(e2.getExtType()))).collect(Collectors.toList());
 	}
 
 	/**
