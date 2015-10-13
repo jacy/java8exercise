@@ -1,6 +1,7 @@
 package com.rc.execise;
 
 import static java.util.Comparator.comparing;
+import static java.util.Comparator.nullsFirst;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,6 +11,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 public class Utils {
 	public static final List<String> EXTTYPE_ORDERING = new ArrayList<String>(Arrays.asList("Other", "TMO", "AO", "Dept", "User"));
@@ -22,9 +25,9 @@ public class Utils {
 	 **/
 
 	public static List<Extension> sortByName(List<Extension> extensions) {
-		Comparator<String> nullFirstComparator = Comparator.nullsFirst(String::compareTo);
+		Comparator<String> nullFirstComparator = nullsFirst(String::compareTo);
 		Comparator<Extension> compator = comparing(Extension::getFirstName).thenComparing(Extension::getLastName, nullFirstComparator).thenComparing(Extension::getExt, nullFirstComparator);
-		return extensions.stream().sorted(compator).collect(Collectors.toList());
+		return extensions.stream().sorted(compator).collect(toList());
 	}
 
 	/**
@@ -33,7 +36,7 @@ public class Utils {
 	 *
 	 **/
 	public static List<Extension> sortByExtType(List<Extension> extensions) {
-		return extensions.stream().sorted((e1, e2) -> Integer.compare(EXTTYPE_ORDERING.indexOf(e1.getExtType()), EXTTYPE_ORDERING.indexOf(e2.getExtType()))).collect(Collectors.toList());
+		return extensions.stream().sorted((e1, e2) -> Integer.compare(EXTTYPE_ORDERING.indexOf(e1.getExtType()), EXTTYPE_ORDERING.indexOf(e2.getExtType()))).collect(toList());
 	}
 
 	/**
@@ -41,8 +44,8 @@ public class Utils {
 	 *
 	 **/
 	public static List<QuaterSalesItem> sumByQuater(List<SaleItem> saleItems) {
-		Map<Integer, Double> quaterMap = saleItems.stream().collect(Collectors.groupingBy(SaleItem::getQuater, Collectors.summingDouble(SaleItem::getSaleNumbers)));
-		return quaterMap.entrySet().stream().map(e -> new QuaterSalesItem(e.getKey(), e.getValue())).collect(Collectors.toList());
+		Map<Integer, Double> quaterMap = saleItems.stream().collect(groupingBy(SaleItem::getQuater, summingDouble(SaleItem::getSaleNumbers)));
+		return quaterMap.entrySet().stream().map(e -> new QuaterSalesItem(e.getKey(), e.getValue())).collect(toList());
 	}
 
 	/**
@@ -50,8 +53,8 @@ public class Utils {
 	 *
 	 **/
 	public static List<QuaterSalesItem> maxByQuater(List<SaleItem> saleItems) {
-		Map<Integer, Optional<SaleItem>> maxQuaterMap = saleItems.stream().collect(Collectors.groupingBy(SaleItem::getQuater, Collectors.reducing(BinaryOperator.maxBy(comparing(SaleItem::getSaleNumbers)))));
-		return maxQuaterMap.entrySet().stream().map(e -> new QuaterSalesItem(e.getKey(), e.getValue().get().getSaleNumbers())).collect(Collectors.toList());
+		Map<Integer, Optional<SaleItem>> maxQuaterMap = saleItems.stream().collect(groupingBy(SaleItem::getQuater, reducing(BinaryOperator.maxBy(comparing(SaleItem::getSaleNumbers)))));
+		return maxQuaterMap.entrySet().stream().map(e -> new QuaterSalesItem(e.getKey(), e.getValue().get().getSaleNumbers())).collect(toList());
 	}
 
 	/**
