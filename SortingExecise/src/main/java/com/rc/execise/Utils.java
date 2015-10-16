@@ -2,20 +2,28 @@ package com.rc.execise;
 
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.nullsFirst;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.reducing;
+import static java.util.stream.Collectors.summingDouble;
+import static java.util.stream.Collectors.toList;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.BinaryOperator;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.*;
 
 public class Utils {
-	public static final List<String> EXTTYPE_ORDERING = new ArrayList<String>(Arrays.asList("Other", "TMO", "AO", "Dept", "User"));
+	public static final Map<String, Integer> EXTTYPE_ORDERING = new HashMap<>(8);
+	static {
+		EXTTYPE_ORDERING.put("Other", 0);
+		EXTTYPE_ORDERING.put("TMO", 1);
+		EXTTYPE_ORDERING.put("AO", 2);
+		EXTTYPE_ORDERING.put("Dept", 3);
+		EXTTYPE_ORDERING.put("User", 4);
+	}
 
 	/**
 	 * Question1, sort by firstName + lastName + ext, if firstName is the same
@@ -28,6 +36,7 @@ public class Utils {
 		Comparator<String> nullFirstComparator = nullsFirst(String::compareTo);
 		Comparator<Extension> compator = comparing(Extension::getFirstName).thenComparing(Extension::getLastName, nullFirstComparator).thenComparing(Extension::getExt, nullFirstComparator);
 		return extensions.stream().sorted(compator).collect(toList());
+
 	}
 
 	/**
@@ -36,7 +45,7 @@ public class Utils {
 	 *
 	 **/
 	public static List<Extension> sortByExtType(List<Extension> extensions) {
-		return extensions.stream().sorted((e1, e2) -> Integer.compare(EXTTYPE_ORDERING.indexOf(e1.getExtType()), EXTTYPE_ORDERING.indexOf(e2.getExtType()))).collect(toList());
+		return extensions.stream().sorted((e1, e2) -> Integer.compare(EXTTYPE_ORDERING.get(e1.getExtType()), EXTTYPE_ORDERING.get(e2.getExtType()))).collect(toList());
 	}
 
 	/**
@@ -44,6 +53,7 @@ public class Utils {
 	 *
 	 **/
 	public static List<QuaterSalesItem> sumByQuater(List<SaleItem> saleItems) {
+		//		saleItems.stream().reduce(new ArrayList<QuaterSalesItem>(), (list, saleItem) -> groupingBy(SaleItem::getQuater, summingDouble(SaleItem::getSaleNumbers)), List::addAll);
 		Map<Integer, Double> quaterMap = saleItems.stream().collect(groupingBy(SaleItem::getQuater, summingDouble(SaleItem::getSaleNumbers)));
 		return quaterMap.entrySet().stream().map(e -> new QuaterSalesItem(e.getKey(), e.getValue())).collect(toList());
 	}
